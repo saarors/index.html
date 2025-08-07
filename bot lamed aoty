@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>בוט לומד</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #chat {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #fff;
+      direction: rtl;
+    }
+
+    .message {
+      margin-bottom: 10px;
+    }
+
+    .user {
+      color: #1a73e8;
+    }
+
+    .bot {
+      color: #34a853;
+    }
+
+    #inputArea {
+      display: flex;
+      border-top: 1px solid #ccc;
+      padding: 10px;
+      background: #eee;
+    }
+
+    input {
+      flex-grow: 1;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-right: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chat"></div>
+
+<div id="inputArea">
+  <input type="text" id="userInput" placeholder="כתוב כאן..." />
+  <button onclick="sendMessage()">שלח</button>
+</div>
+
+<script>
+  const chat = document.getElementById("chat");
+  const userInput = document.getElementById("userInput");
+
+  const knowledge = {};
+
+  function appendMessage(text, sender) {
+    const message = document.createElement("div");
+    message.className = "message " + sender;
+    message.textContent = (sender === "user" ? "אתה: " : "בוט: ") + text;
+    chat.appendChild(message);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function sendMessage() {
+    const input = userInput.value.trim();
+    if (!input) return;
+
+    appendMessage(input, "user");
+    userInput.value = "";
+
+    const response = getBotResponse(input);
+    setTimeout(() => appendMessage(response, "bot"), 500);
+  }
+
+  function getBotResponse(input) {
+    if (input.toLowerCase().startsWith("למד:")) {
+      const parts = input.split(":");
+      if (parts.length >= 3) {
+        const key = parts[1].trim();
+        const value = parts.slice(2).join(":").trim();
+        knowledge[key] = value;
+        return `למדתי ש-${key} זה ${value}`;
+      } else {
+        return "הפורמט לא תקין. נסה כך: למד: מילה: משמעות";
+      }
+    }
+
+    if (knowledge[input]) {
+      return `אני זוכר! ${knowledge[input]}`;
+    }
+
+    return "לא הבנתי, אולי תלמד אותי?";
+  }
+
+  userInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") sendMessage();
+  });
+</script>
+
+</body>
+</html>
